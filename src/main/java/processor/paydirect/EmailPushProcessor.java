@@ -12,13 +12,14 @@ import util.datatype.CurrencyUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class EmailPushProcessor implements IProcessor {
 
     @Override
     public void execute(Payment payment) throws Exception {
         if (payment == null || payment.getAmount() == 0)
-            PaymentNotificationException.raiseError("[EmailNotifierError] : invalid request (see amount/object)");
+            PaymentNotificationException.raiseError("[EmailNotifier-Error] : invalid request (see amount/object)");
 
         String mailBody = null;
         String mailSubject = "";
@@ -27,6 +28,9 @@ public class EmailPushProcessor implements IProcessor {
         String nairaSymbol = SystemSettingFactory.SystemSetting().getNairaSymbol();
         String customerReference = payment.getCustReference() != null ? payment.getCustReference() : payment.getCustomerNumberMask();
         List<Currency> currencies = new Currency().execute("{call dbo.uspGetAllCurrency()}", null);
+
+        Optional<Currency> ngn = currencies.stream().filter(p -> p.getCurrencyCode().equals("NGN")).findFirst();
+
 
         Currency defaultCurrency = CurrencyUtil.filterCurrencyByCode(currencies, "NGN");
         if (defaultCurrency != null) {

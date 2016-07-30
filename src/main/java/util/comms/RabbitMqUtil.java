@@ -16,6 +16,7 @@ import java.util.concurrent.TimeoutException;
 public class RabbitMqUtil {
 
     private static Connection _connection;
+
     private static Connection getConnection() throws IOException, TimeoutException {
         if(_connection == null){
             SystemSetting setting = SystemSettingFactory.SystemSetting();

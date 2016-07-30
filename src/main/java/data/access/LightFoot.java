@@ -108,7 +108,7 @@ public class LightFoot<T> {
             }
             rs.close();
 
-            long elapsed = timer.Elapsed(false);
+            long elapsed = timer.elapsed(false);
             System.out.println(String.format("reader took: %d ms (%d ns)", elapsed / 100000, elapsed));
             return coll;
         } catch (Exception ex) {

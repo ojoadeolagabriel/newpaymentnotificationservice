@@ -8,7 +8,7 @@ public class StopWatchUtil implements AutoCloseable{
         startTimeLocalNS = System.nanoTime();
     }
 
-    public long Elapsed(boolean reset){
+    public long elapsed(boolean reset){
         long stopTime = System.nanoTime();
         long interval = (stopTime - startTimeLocalNS);
 

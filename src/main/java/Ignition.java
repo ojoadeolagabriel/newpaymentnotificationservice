@@ -7,6 +7,7 @@ import facade.business.PnsProcessorFactory;
 import facade.dto.PnsDataProvider;
 import org.apache.log4j.Logger;
 import processor.paydirect.EmailPushProcessor;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -17,6 +18,13 @@ public class Ignition {
     public static Queue<Payment> paymentsQueue = new ConcurrentLinkedDeque<>();
 
     public static void main(String[] args) throws InstantiationException, IllegalAccessException, InterruptedException, SQLServerException {
+
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(5);
+        ScheduledFuture scheduledFuture = service.schedule(() -> {
+            Integer i = 9;
+            return i.toString();
+        }, 5000, TimeUnit.MILLISECONDS);
+        service.shutdown();
 
         logger.debug("starting..");
         EmailPushProcessor proc = new EmailPushProcessor();
@@ -33,6 +41,9 @@ public class Ignition {
 
         AutogateProcessor autogateProcessor = new AutogateProcessor();
         List<AutogateProcessor> processors = autogateProcessor.execute("{call dbo.uspSelectAutogateProcessors()}", null);
+        Optional<AutogateProcessor> fbnProc = processors.stream().filter(c -> c.getCbnCode().equals("011")).findFirst();
+
+        processors.forEach(j -> sendAlert(j));
         AutogateProcessorFactory.trigger(processors);
 
         for (int i = 0; i < 1000; i++) {
@@ -42,5 +53,15 @@ public class Ignition {
         }
 
         TimeUnit.SECONDS.sleep(3);
+    }
+
+    /**
+     * sendAlert
+     * @param processor
+     */
+    private static void sendAlert(AutogateProcessor processor) {
+        if (processor != null) {
+            logger.debug("found " + processor.getCbnCode());
+        }
     }
 }
